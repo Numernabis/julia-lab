@@ -24,5 +24,11 @@ function quicksort(a,l,r)
     return a
 end
 
+# wrapper
+function qs(tab)
+    quicksort(tab, 1, length(tab))
+end
+
+# API
 tab = [54,21,15,12,6,16,26,1,7,3,74]
-quicksort(tab, 1, length(tab))
+qs(tab)
