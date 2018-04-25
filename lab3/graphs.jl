@@ -128,23 +128,22 @@ function check_euler(graph::Array{GraphVertex,1})
 end
 
 # Optimization: separate methods for various types
-format_node(node::Person) = "Person: $(node.name)\n"
-format_node(node::Address) = "Street nr: $(node.streetNumber)\n"
+function convert_node_to_str(graph_buff::IOBuffer, node::Person)
+    println(graph_buff, "****\nPerson: ", node.name)
+end
+function convert_node_to_str(graph_buff::IOBuffer, node::Address)
+    println(graph_buff, "****\nStreet nr: ", node.streetNumber)
+end
 
 #= Returns text representation of the graph consisiting of each node's value
    text and number of its neighbors. =#
-function graph_to_str(graph::Array{GraphVertex, 1})
-  graph_str = ""
-  for v in graph
-    graph_str *= "****\n"
-
-    n = v.value
-    node_str = format_node(n)
-
-    graph_str *= node_str
-    graph_str *= "Neighbors: $(length(v.neighbors))\n"
-  end
-  graph_str
+function graph_to_str(graph::Array{GraphVertex,1})
+    graph_buff = IOBuffer()
+    for v in graph
+        convert_node_to_str(graph_buff, v.value)
+        println(graph_buff, "Neighbors: ", length(v.neighbors))
+    end
+    String(take!(graph_buff))
 end
 
 #= Tests graph functions by creating 100 graphs, checking Euler cycle

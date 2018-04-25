@@ -10,7 +10,7 @@ Opis zastosowanych optymalizacji:
   `nodes` jako `Array{NodeType, 1}`, `graph` jako `Array{GraphVertex, 1}`,
 4. dodanie informacji o typach zmiennych,
   `convert_node_to_str` z zastosowaniem _multiple dispatch_
-5.
+5. buforowane wyjście w funkcji `graph_to_str` (użycie `graph_buff::IOBuffer`)
 
 | Opt. No | Time              | Memory          |
 |--------:|------------------:|----------------:|
@@ -19,4 +19,4 @@ Opis zastosowanych optymalizacji:
 |      2  |  3.526876 seconds | (5.50 M allocations: 3.321 GiB, 18.64% gc time)   |
 |      3  |  3.134581 seconds | (3.78 M allocations: 3.288 GiB, 19.86% gc time)   |
 |      4  |  3.013134 seconds | (3.74 M allocations: 3.288 GiB, 21.22% gc time)   |
-|      5  |  |  |
+|      5  |  0.887800 seconds | (2.97 M allocations: 165.057 MiB, 3.50% gc time)  |
