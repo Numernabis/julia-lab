@@ -20,3 +20,13 @@ function main()
         j += 1
     end
 end
+
+main()
+Profile.clear()
+Profile.init(n = 10^7, delay = 0.1)
+@profile main()
+#Profile.print()
+#Profile.print(format=:flat)
+
+using ProfileView
+ProfileView.view()
