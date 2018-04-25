@@ -29,10 +29,10 @@ end
 
 
 # Number of graph nodes.
-N = 800
+const N = 800
 
 # Number of graph edges.
-K = 10000
+const K = 10000
 
 
 #= Generates random directed graph of size N with K edges
