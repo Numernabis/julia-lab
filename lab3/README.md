@@ -5,7 +5,7 @@
 
 Opis zastosowanych optymalizacji:
 1. zmienne globalne `N, K` jako stałe,
-2.
+2. reprezentacja macierzy sąsiedztwa grafu jako `BitArray`,
 3.
 4.
 5.
@@ -14,7 +14,7 @@ Opis zastosowanych optymalizacji:
 |--------:|------------------:|----------------:|
 |      0  | 12.871667 seconds | (121.82 M allocations: 6.527 GiB, 13.89% gc time) |
 |      1  |  4.177649 seconds | (5.49 M allocations: 3.790 GiB, 16.52% gc time)|  |
-|      2  |  |  |
+|      2  |  3.526876 seconds | (5.50 M allocations: 3.321 GiB, 18.64% gc time)|  |
 |      3  |  |  |
 |      4  |  |  |
 |      5  |  |  |

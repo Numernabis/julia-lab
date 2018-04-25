@@ -38,16 +38,13 @@ const K = 10000
 #= Generates random directed graph of size N with K edges
 and returns its adjacency matrix.=#
 function generate_random_graph()
-    A = Array{Int64,2}(N, N)
-
-    for i=1:N, j=1:N
-      A[i,j] = 0
-    end
+    A = BitArray(N, N)
+    A .= false
 
     for i in sample(1:N*N, K, replace=false)
       row, col = ind2sub(size(A), i)
-      A[row,col] = 1
-      A[col,row] = 1
+      A[row,col] = true
+      A[col,row] = true
     end
     A
 end
@@ -78,7 +75,7 @@ function convert_to_graph(A, nodes)
   push!(graph, map(n -> GraphVertex(n, GraphVertex[]), nodes)...)
 
   for i = 1:N, j = 1:N
-      if A[i,j] == 1
+      if A[i,j]
         push!(graph[i].neighbors, graph[j])
       end
   end
