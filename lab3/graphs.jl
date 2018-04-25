@@ -12,24 +12,24 @@ export GraphVertex, NodeType, Person, Address,
 #= Single graph vertex type.
 Holds node value and information about adjacent vertices =#
 mutable struct GraphVertex
-  value
-  neighbors ::Vector
+  value::Any
+  neighbors::Vector
 end
 
 # Types of valid graph node's values.
 abstract type NodeType end
 
-mutable struct Person <: NodeType
-  name
+mutable struct Person{T<:AbstractString} <: NodeType
+  name::T
 end
 
-mutable struct Address <: NodeType
-  streetNumber
+mutable struct Address{T<:Integer} <: NodeType
+  streetNumber::T
 end
 
 #= Generates random directed graph of size N with K edges
 and returns its adjacency matrix.=#
-function generate_random_graph(N, K)
+function generate_random_graph(N::Int64, K::Int64)
     A = BitArray(N, N)
     A .= false
 
@@ -46,13 +46,13 @@ function get_random_person()
   Person(randstring())
 end
 
-# Generates random person object (with random name).
+# Generates random address object (with random streetNumber).
 function get_random_address()
   Address(rand(1:100))
 end
 
 # Generates N random nodes (of random NodeType).
-function generate_random_nodes(N)
+function generate_random_nodes(N::Int64)
   nodes = Array{NodeType, 1}(N)
   for i = 1:N
     if (rand() > 0.5)
@@ -66,9 +66,9 @@ end
 
 #= Converts given adjacency matrix (NxN)
   into list of graph vertices (of type GraphVertex and length N). =#
-function convert_to_graph(A, nodes)
-  B = length(nodes)
-  graph = map(n -> GraphVertex(n, GraphVertex[]), nodes)
+function convert_to_graph(A::BitArray, nodes::Array{NodeType, 1})
+    B::Int64 = length(nodes)
+    graph::Array{GraphVertex, 1} = map(n -> GraphVertex(n, GraphVertex[]), nodes)
 
   for i = 1:B, j = 1:B
       if A[i,j]
@@ -80,7 +80,7 @@ end
 
 #= Groups graph nodes into connected parts. E.g. if entire graph is connected,
   result list will contain only one part with all nodes. =#
-function partition(graph)
+function partition(graph::Array{GraphVertex,1})
   parts = []
   remaining = Set(graph)
   visited = bfs(remaining=remaining)
@@ -88,7 +88,7 @@ function partition(graph)
 
   while !isempty(remaining)
     new_visited = bfs(visited=visited, remaining=remaining)
-    push!(parts, new_visited)
+    push!(parts, Set(new_visited))
   end
   parts
 end
@@ -96,7 +96,7 @@ end
 #= Performs BFS traversal on the graph and returns list of visited nodes.
   Optionally, BFS can initialized with set of skipped and remaining nodes.
   Start nodes is taken from the set of remaining elements. =#
-function bfs(;visited=Set(), remaining=Set(graph))
+function bfs(;visited::Set=Set(), remaining::Set=Set(graph))
   first = next(remaining, start(remaining))[1]
   q = [first]
   push!(visited, first)
@@ -120,26 +120,26 @@ end
 
 #= Checks if there's Euler cycle in the graph by investigating
    connectivity condition and evaluating if every vertex has even degree =#
-function check_euler(graph)
+function check_euler(graph::Array{GraphVertex,1})
   if length(partition(graph)) == 1
     return all(map(v -> iseven(length(v.neighbors)), graph))
   end
     "Graph is not connected"
 end
 
+# Optimization: separate methods for various types
+format_node(node::Person) = "Person: $(node.name)\n"
+format_node(node::Address) = "Street nr: $(node.streetNumber)\n"
+
 #= Returns text representation of the graph consisiting of each node's value
    text and number of its neighbors. =#
-function graph_to_str(graph)
+function graph_to_str(graph::Array{GraphVertex, 1})
   graph_str = ""
   for v in graph
     graph_str *= "****\n"
 
     n = v.value
-    if isa(n, Person)
-      node_str = "Person: $(n.name)\n"
-    else isa(n, Address)
-      node_str = "Street nr: $(n.streetNumber)\n"
-    end
+    node_str = format_node(n)
 
     graph_str *= node_str
     graph_str *= "Neighbors: $(length(v.neighbors))\n"
