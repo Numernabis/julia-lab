@@ -4,11 +4,11 @@
 ### 2. Optymalizacja wydajności biblioteki grafowej
 
 Opis zastosowanych optymalizacji:
-1. zmienne globalne N, K jako stałe
+1.
 2.
 3.
 4.
-5. 
+5.
 
 | Opt. No | Time              | Memory          |
 |--------:|:------------------|:----------------|
