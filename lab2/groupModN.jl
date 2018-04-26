@@ -23,23 +23,21 @@ struct Gn{N} <: Integer
     end
 end
 
-*(a::Gn{N}, b::Gn{N}) where {N} = Gn{N}(((a.x % N) * (b.x % N)) % N)
+*(a::Gn{N}, b::Gn{N}) where {N} = Gn{N}((a.x * b.x) % N)
 *(a::Gn{N}, b::T) where {N, T<:Integer} = a * Gn{N}(b)
 *(a::T, b::Gn{N}) where {N, T<:Integer} = Gn{N}(a) * b
 
 convert(::Type{Gn{N}}, z::Int64) where {N} = Gn{N}(z)
 convert(::Type{Int64}, z::Gn{N}) where {N} = z.x
 
-promote_rule(::Type{Gn{N}}, ::Type{T}) where {N, T<:Integer} = Int64
-promote_rule(::Type{Gn{N}}, ::Type{Int64}) where {N} = Int64
+promote_rule(::Type{Gn{N}}, ::Type{T}) where {N, T<:Integer} = T
 
 function pow(a::Gn{N}, x::T) where{N, T<:Integer}
-    z = 1
-    while (x > 0)
-        z = (z * a.x) % N
-        x = x - 1
+    z::Gn{N} = 1
+    for i = 1:x
+        z = z * a
     end
-    return Gn{N}(z)
+    return z
 end
 
 function period(a::Gn{N}) where {N}
@@ -53,12 +51,14 @@ function period(a::Gn{N}) where {N}
 end
 
 function inverse_element(a::Gn{N}) where {N}
-    b = 1
-    while (b != a.x + 1)
-        if ((a.x * b) % N == 1)
-            return Gn{N}(b)
+    for b = 1:N
+        try
+            if a * b == 1
+                return Gn{N}(b)
+            end
+        catch
+            continue
         end
-        b = b + 1
     end
 end
 
@@ -67,29 +67,27 @@ function group_size(::Type{Gn{N}}) where {N}
     s = 0
     while a < N
         a = a + 1
-        s = s + 1
         try
             Gn{N}(a)
+            s = s + 1
         catch
-            s = s - 1
+
         end
     end
     return s
 end
 
-println(promote_type(Gn{55}, Int64))
-
 N = 55 #klucz publiczny
-c = 17 #klucz publiczny
-b = 4 #zakodowana wiadomość
-r = period(Gn{N}(b))
+c = Gn{N}(17) #klucz publiczny
+b = Gn{N}(4) #zakodowana wiadomość
+r = period(b)
 println("r = ", r)
 
-d = inverse_element(Gn{N}(c))
+d = inverse_element(c)
 println("d = ", d)
 
-a = ^(Gn{N}(b), d.x)
+a = pow(b, d)
 println("a = ", a)
 
-test = ^(a, c).x
+test = pow(a, c).x
 println("test = ", test)
