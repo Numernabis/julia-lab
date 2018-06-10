@@ -1,3 +1,5 @@
+// JULIA LAB4
+// completed
 
 Pkg.status("DifferentialEquations")
 Pkg.status("DataFrames")
