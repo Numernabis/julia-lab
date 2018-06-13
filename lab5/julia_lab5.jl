@@ -25,29 +25,22 @@ autodiff(n::Number) = 0
 autodiff(s::Symbol) = 1
 
 function autodiff(ex::Expr, ::Type{Val{:+}})::Expr
-    f = ex.args[2]
-    g = ex.args[3]
-    df = autodiff(f)
-    dg = autodiff(g)
-    :($df + $dg)
+    Expr(:call, :+, map(f -> autodiff(f), ex.args[2:end])...)
 end
 function autodiff(ex::Expr, ::Type{Val{:-}})::Expr
-    f = ex.args[2]
-    g = ex.args[3]
-    df = autodiff(f)
-    dg = autodiff(g)
-    :($df - $dg)
+    Expr(:call, :-, map(f -> autodiff(f), ex.args[2:end])...)
 end 
 
 function autodiff(ex::Expr, ::Type{Val{:*}})::Expr
-    f = ex.args[2]
-    g = ex.args[3]
-    df = autodiff(f)
-    dg = autodiff(g)
-    :($df * $g + $f * $dg)
-end
-        
-        
+    sum = []
+    args = ex.args[2:end]
+    for (i, f) in enumerate(args)
+        mul = [autodiff(f), args[1:end .!= i]...]
+        push!(sum, Expr(:call, :*, mul...))
+    end
+    Expr(:call, :+, sum...)
+    #:($df * $g + $f * $dg)
+end      
 function autodiff(ex::Expr, ::Type{Val{:/}})::Expr
     f = ex.args[2]
     g = ex.args[3]
@@ -64,13 +57,14 @@ function autodiff(ex::Expr)::Expr
     autodiff(ex, op)
 end
 
-ex = :(x*x + 3*x)
+ex = :(x*x*x + x*x - 4*x)
 
 dex = autodiff(ex)
 
 x = 2
 eval(dex)
 
+# based on: https://github.com/JuliaDiff/DualNumbers.jl
 using DualNumbers
 function autodiffFun(f)
    g(x) = dualpart(f(Dual(x, 1))) 
